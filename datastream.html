@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>p5.js Sketch</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; overflow: hidden; }
+  canvas { display: block; }
+  .ibm-plex-mono-bold {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 700;
+    font-style: normal;
+  }
+</style>
+</head>
+<body>
+<script>
+var charset = "▒▀▝░▓";
+let colors = {};
+let elementsY; // Declare without initial value
+
+function setup() {
+  // Adjust canvas size dynamically while maintaining a 9:16 aspect ratio
+  let canvasSize = calculateCanvasSize();
+  createCanvas(canvasSize.width, canvasSize.height);
+
+  // Assign a random value to elementsY, for example between 10 and 70
+  elementsY = Math.floor(random(10, 70)); // Use Math.floor to ensure it's an integer
+
+  colors['▒'] = color("#590d22");
+  colors['▀'] = color("#800f2f");
+  colors['▝'] = color("#a4133c");
+  colors['░'] = color("#c9184a");
+  colors['▓'] = color("#ff4d6d");
+
+  // Now that we're using a web font, set it using the CSS class
+  textFont("IBM Plex Mono");
+  textStyle(BOLD);
+}
+
+function draw() {
+  background("#fff0f3");
+
+  fill(0);
+  noStroke();
+
+  // Since we are using Google Fonts, we no longer need to set the font in draw
+  textAlign(CENTER, CENTER);
+  textSize((height / elementsY) * 2.5);
+
+  for (let y = 0; y < elementsY + 1; y++) {
+    for (let x = 0; x < charset.length; x++) {
+      let posY = map(y, 0, elementsY, 0, height);
+      let magX = map(
+        tan(radians(posY * 0.5 + frameCount / 1.1)),
+        -1,
+        1,
+        -height * 0.4,
+        height * 0.4
+      );
+      let posX = map(x, 0, charset.length, magX, -magX);
+
+      let selector = charset[x];
+
+      push();
+      translate(width / 2 + posX, posY);
+      fill(colors[selector]);
+      text(charset[x], 0, 0);
+      pop();
+    }
+  }
+}
+
+function windowResized() {
+  let canvasSize = calculateCanvasSize();
+  resizeCanvas(canvasSize.width, canvasSize.height);
+}
+
+function calculateCanvasSize() {
+  let winRatio = windowHeight / windowWidth;
+  let targetRatio = 16 / 9;
+  let canvasWidth, canvasHeight;
+
+  if (winRatio > targetRatio) {
+    canvasWidth = windowWidth;
+    canvasHeight = windowWidth * targetRatio;
+  } else {
+    canvasHeight = windowHeight;
+    canvasWidth = windowHeight / targetRatio;
+  }
+
+  return {width: canvasWidth, height: canvasHeight};
+}
+
+function keyTyped() {
+  if (key === "s") {
+    saveCanvas("myCanvas", "jpg");
+  } else if (key == "g") {
+    saveGif("mySketch", 4);
+  }
+}
+</script>
+</body>
+</html>
